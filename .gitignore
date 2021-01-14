@@ -1,0 +1,5 @@
+.theia/
+venv/
+clients.json
+*.log
+__pycache__/
