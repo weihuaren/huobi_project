@@ -1,18 +1,19 @@
 import logging
 import json
-from huobi.client.account import AccountClient
 from huobi.constant import *
+from .client import MyAccountClient
+from huobi.client.market import MarketClient
+from huobi.utils import *
+from .info import volume, volume_average
+client = MyAccountClient()
+market_client = MarketClient()
+def run():
+    print("5v  :" + str(volume(CandlestickInterval.MIN5)))
+    print("5vj :" + str(volume_average(CandlestickInterval.MIN5)))
+    # print("15v :" + str(volume(CandlestickInterval.MIN15)))
+    # print("15vj:" + str(volume_average(CandlestickInterval.MIN15)))
+    # print("30v :" + str(volume(CandlestickInterval.MIN30)))
+    # print("30vj:" + str(volume_average(CandlestickInterval.MIN30)))
 
-def trade():
-    with open('clients.json') as json_file: 
-        clients = json.load(json_file)
-        for client in clients:
-            logging.info(client)
-            account_client = AccountClient(api_key=client["api_key"], secret_key=client["secret_key"])
-            account_balance_list = account_client.get_account_balance()
-            if account_balance_list and len(account_balance_list):
-                    for account_obj in account_balance_list:
-                        account_obj.print_object()
-
-trade()
+                
 
