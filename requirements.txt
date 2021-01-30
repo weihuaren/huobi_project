@@ -1,2 +1,4 @@
 aiohttp
 schedule
+pandas_ta
+tabulate

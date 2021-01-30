@@ -4,16 +4,14 @@ from huobi.constant import *
 from .client import MyAccountClient
 from huobi.client.market import MarketClient
 from huobi.utils import *
-from .info import volume, volume_average
+from .info import trade_info
+from pprint import pprint
 client = MyAccountClient()
 market_client = MarketClient()
+
 def run():
-    print("5v  :" + str(volume(CandlestickInterval.MIN5)))
-    print("5vj :" + str(volume_average(CandlestickInterval.MIN5)))
-    # print("15v :" + str(volume(CandlestickInterval.MIN15)))
-    # print("15vj:" + str(volume_average(CandlestickInterval.MIN15)))
-    # print("30v :" + str(volume(CandlestickInterval.MIN30)))
-    # print("30vj:" + str(volume_average(CandlestickInterval.MIN30)))
+    # print(trade_info(CandlestickInterval.MIN5, 20))
+    pprint(trade_info(CandlestickInterval.MIN5, ma_length=20, fast_length=12, slow_length=26, signal_length=9))
 
                 
 
