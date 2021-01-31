@@ -14,18 +14,29 @@ symbol = "btcusdt"
 def get_indicators(interval):
     candlesticks = market_client.get_candlestick(symbol, interval)
     macd =  _get_macd(candlesticks)
+    average = _close_volume_average(candlesticks[:20])
+    previous_average = _close_volume_average(candlesticks[1:21])
     return {
         "volume": candlesticks[0].amount,
-        "volume_average": _volume_average(candlesticks[:20]),
+        "average_volume": average['average_volume'],
+        "average_close": average['average_close'],   
+        "previous_average_close": previous_average['average_close'],     
         "dif": macd['dif'],
         "histogram": macd['histogram'],
-        "dea": macd['dea']
+        "dea": macd['dea'],
+        "previous_histogram": macd['previous_histogram'],
+        "close":  candlesticks[0].close
     }
-def _volume_average(candlesticks):
-    sum = 0
+def _close_volume_average(candlesticks):
+    volume = 0
+    close = 0
     for candlestick in candlesticks:
-        sum = sum + candlestick.amount
-    return sum/len(candlesticks)
+        volume = volume + candlestick.amount
+        close = close + candlestick.close
+    return {
+        'average_volume': volume/len(candlesticks),
+        'average_close': close/len(candlesticks)
+    }
 
 def _get_macd(candlesticks):
     market_data = []
@@ -41,7 +52,8 @@ def _get_macd(candlesticks):
     return {
         'dif': df['dif'].iloc[-1],
         'histogram': df['histogram'].iloc[-1],
-        'dea': df['dea'].iloc[-1]
+        'dea': df['dea'].iloc[-1],
+        'previous_histogram': df['histogram'].iloc[-2],
     }
 
 
