@@ -11,6 +11,8 @@ client = MyAccountClient()
 market_client = MarketClient()
 symbol = "btcusdt"
 
+
+
 def get_indicators(interval):
     candlesticks = market_client.get_candlestick(symbol, interval)
     macd =  _get_macd(candlesticks)
