@@ -15,10 +15,12 @@ def get_indicators(interval):
     candlesticks = market_client.get_candlestick(symbol, interval)
     macd =  _get_macd(candlesticks)
     average = _close_volume_average(candlesticks[:20])
+    average_ma10 = _close_volume_average(candlesticks[:10])
     return {
         "volume": candlesticks[0].amount,
         "average_volume": average['average_volume'],
-        "average_close": average['average_close'],   
+        "average_close": average['average_close'],
+        "average_close_ma10": average_ma10['average_close'],
         "dif": macd['dif'],
         "histogram": macd['histogram'],
         "dea": macd['dea'],

@@ -20,7 +20,7 @@ def run():
     k3 = None
     
     while not k1:
-        time.sleep(5)
+        time.sleep(1)
         indicators_min5 = get_indicators(CandlestickInterval.MIN5)
         indicators_min15 = get_indicators(CandlestickInterval.MIN15)
         indicators_min60 = get_indicators(CandlestickInterval.MIN60)
@@ -45,7 +45,7 @@ def run():
                                 print("buy USD -> BTC")
     
     while not k2:
-        time.sleep(5)
+        time.sleep(1)
         indicators_min5 = get_indicators(CandlestickInterval.MIN5)
         # if:k2=80%5j20 (+- 0.5%)
         if 0.8*indicators_min5['average_close']*0.995 <= indicators_min5['close'] <= 0.8*indicators_min5['average_close']*1.005:
@@ -53,7 +53,7 @@ def run():
             print("sell")
     
     while not k3:
-        time.sleep(5)
+        time.sleep(1)
         indicators_min5 = get_indicators(CandlestickInterval.MIN5)
         indicators_min15 = get_indicators(CandlestickInterval.MIN15)
         indicators_min60 = get_indicators(CandlestickInterval.MIN60)
@@ -80,11 +80,13 @@ def run():
                                             print('buy')
 
     k4 = None
+    ifSell = False
     m4 = None
-    d4 = None
+    d4 = None    
     while True:
-        time.sleep(5)
+        time.sleep(1)
         indicators_min5 = get_indicators(CandlestickInterval.MIN5)
+
         if not K4 or indicators_min5['close'] < 0:
             K4 = indicators_min5['close']
             m4 = indicators_min5['histogram']
@@ -94,16 +96,19 @@ def run():
             m4 = indicators_min5['histogram']
             d4 = indicators_min5['dif']
         else if k4 and k4 > 0 and indicators_min5['close'] > 0:
-            if indicators_min5['close'] > k4:
+            if indicators_min5['close'] >= k4:
                 K4 = indicators_min5['close']
                 m4 = indicators_min5['histogram']
                 d4 = indicators_min5['dif']
-                
-            else:
+            else if indicators_min5['close'] < k4:
+                ifSell = True
 
-            K4 = indicators_min5['close']
-            m4 = indicators_min5['histogram']
-            d4 = indicators_min5['dif']
+        if ifSell:
+            if indicators_min5['close'] > indicators_min5['close_average']:
+                if indicators_min5['histogram'] < m4:
+                    if indicators_min5['dif'] < d4:
+                        print("sell")
+                        break
         
 
                                
