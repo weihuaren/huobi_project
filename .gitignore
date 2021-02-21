@@ -3,3 +3,4 @@ venv/
 key.json
 *.log
 __pycache__/
+tradelog.txt

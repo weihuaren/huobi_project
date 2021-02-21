@@ -2,7 +2,11 @@ import logging
 import schedule
 import time
 from src.algorithm import run
-logging.basicConfig(format='%(asctime)s %(message)s', filename='huobi_project.log', filemode='w', level=logging.DEBUG)
+logging.basicConfig(handlers=[logging.FileHandler(filename="tradelog.txt", 
+                                                 encoding='utf-8', mode='a+')],
+                    format="%(asctime)s %(name)s:%(levelname)s:%(message)s", 
+                    datefmt="%F %A %T", 
+                    level=logging.INFO)
 
 if __name__ == '__main__':
     run()
