@@ -22,14 +22,14 @@ def run():
         time.sleep(0.5)
         cs_min1 = get_indicators(CandlestickInterval.MIN1)
         print(cs_min1)
-        if (not m1) and (not d1) and (not k1) \
+        if (not k2) and (not m1) and (not d1) and (not k1) \
         and (cs_min1['m'] < 0) \
         and (cs_min1['d'] < 0):
             m1 = cs_min1['m']
             d1 = cs_min1['d']
             k1 = cs_min1['k']
 
-        if m1 and d1 and k1 \
+        if (not k2) and m1 and d1 and k1 \
         and cs_min1['d'] > 0:
             m1 = None
             d1 = None
