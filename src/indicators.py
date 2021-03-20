@@ -5,52 +5,32 @@ from huobi.client.market import MarketClient
 from huobi.utils import *
 from .client import MyAccountClient
 import pandas as pd
+from .futures import get_klines
 
 client = MyAccountClient()
 market_client = MarketClient()
-symbol = "btcusdt"
 
-def get_indicators(interval):
-    candlesticks = market_client.get_candlestick(symbol, interval)
-    macd =  _get_macd(candlesticks)
-    average = _close_volume_average(candlesticks[:20])
-    average_ma10 = _close_volume_average(candlesticks[:10])
-    return {
-        "v": candlesticks[0].amount,
-        "average_v": average['average_volume'],
-        "average_close": average['average_close'],
-        "average_close_ma10": average_ma10['average_close'],
-        "d": macd['dif'],
-        "m": macd['histogram'],
-        "dea": macd['dea'],
-        "previous_histogram": macd['previous_histogram'],
-        "k":  candlesticks[0].close
-    }
-def _close_volume_average(candlesticks):
-    volume = 0
-    close = 0
-    for candlestick in candlesticks:
-        volume = volume + candlestick.amount
-        close = close + candlestick.close
-    return {
-        'average_volume': volume/len(candlesticks),
-        'average_close': close/len(candlesticks)
-    }
-
-def _get_macd(candlesticks):
-    market_data = []
-    for stick in candlesticks:
-        market_data.append({'close': stick.close})
-    market_data.reverse()
-    df = pd.DataFrame.from_dict(market_data)
+def get_indicators():
+    data = []
+    klines = get_klines()
+    for kline in klines:
+        print(kline)
+        data.append({'close': kline['close'], 'volume': kline['vol']})
+    df = pd.DataFrame.from_dict(data)
     df['ema12'] = pd.Series.ewm(df['close'], span=12).mean()
     df['ema26'] = pd.Series.ewm(df['close'], span=26).mean()
     df['dif']= df['ema12'] - df['ema26']
     df['dea']= pd.Series.ewm(df['dif'], span=9).mean()
     df['histogram']= df['dif'] - df['dea']
+    df['ma20_volume'] = df['volume'].rolling(window=20).mean()
+    df['ma20_close'] = df['close'].rolling(window=20).mean()
     return {
-        'dif': df['dif'].iloc[-1],
-        'histogram': df['histogram'].iloc[-1],
+        'volume': df['volume'].iloc[-1],
+        'ma20_volume': df['ma20_volume'].iloc[-1],
+        'k': df['close'].iloc[-1],
+        'ma20_close': df['ma20_close'].iloc[-1],
+        'd': df['dif'].iloc[-1],
+        'm': df['histogram'].iloc[-1],
         'dea': df['dea'].iloc[-1],
         'previous_histogram': df['histogram'].iloc[-2],
     }

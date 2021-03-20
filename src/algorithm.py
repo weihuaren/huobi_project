@@ -6,6 +6,7 @@ from .client import MyAccountClient
 from huobi.client.market import MarketClient
 from huobi.utils import *
 from .indicators import get_indicators
+from pprint import pprint
 
 logger = get_logger('algorithm')
 
@@ -21,8 +22,8 @@ def run():
     while True:
         time.sleep(0.5)
         try :
-            cs_min1 = get_indicators(CandlestickInterval.MIN1)
-            print(cs_min1)
+            cs_min1 = get_indicators()
+            pprint(cs_min1)
             if (not k2) and (not m1) and (not d1) and (not k1) \
             and (cs_min1['m'] < 0) \
             and (cs_min1['d'] < 0):
