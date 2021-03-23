@@ -18,33 +18,38 @@ def run_long():
     m1 = None
     d1 = None
     k1 = None
+    k1_min = None
     k2 = None
     logger.info(f"上升策略程序开始运行")
     while True:
-        time.sleep(0.5)
+        time.sleep(1)
         try :
             data = get_indicators()
             if data == 'error':
                 continue
-
             if (not k2) and (not m1) and (not d1) and (not k1) \
             and (data['m'] < 0) \
             and (data['d'] < 0):
                 m1 = data['m']
                 d1 = data['d']
                 k1 = data['k']
+                k1_min = data['k']
+                continue
 
             if (not k2) and m1 and d1 and k1 \
             and data['d'] > 0:
                 m1 = None
                 d1 = None
                 k1 = None
+                k1_min = None
                 continue
 
             if m1 and d1 and k1:
                 m1 = min(m1, data['m'])
-                d1 = min(d1, data['d'])
-                k1 = min(k1, data['k'])
+                k1_min = min(k1_min, data['k'])
+                if data['d'] < d1:
+                    d1 =  data['d']
+                    k1 = k1_min
 
             if (not k2) and m1 and d1 and k1 \
             and (d1 < m1) \
@@ -62,6 +67,10 @@ def run_long():
                 logger.info(f"m1={m1} m2={data['m']}")
                 logger.info(f"d1={d1} d2={data['d']}")
 
+            if k2 and data['k'] < k2*0.994:
+                logger.info(f"上升止损平仓")
+                logger.info(f"上升止损平仓k: {data['k']}")
+                break
             if k2 \
             and (data['d'] > 0 \
             or data['d'] < d1 \
@@ -86,8 +95,9 @@ def run_short():
     k2 = None
     logger.info(f"下降策略程序开始运行")
     while True:
-        time.sleep(0.5)
+        time.sleep(1)
         try :
+            logger.info(f'short m1:{m1} d1:{d1} k1:{k1} k2:{k2}')
             data = get_indicators()
             if data == 'error':
                 continue
@@ -98,7 +108,7 @@ def run_short():
                 m1 = data['m']
                 d1 = data['d']
                 k1 = data['k']
-
+                continue
             if (not k2) and m1 and d1 and k1 \
             and data['d'] < 0:
                 m1 = None
