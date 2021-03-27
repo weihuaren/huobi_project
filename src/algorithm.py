@@ -56,8 +56,8 @@ def run_long():
             and data['m'] > m1 \
             and data['d'] > d1 \
             and data['d'] < data['m'] \
-            and data['k'] < k1:
-            # and data['v'] > 2.9*data['average_v']:
+            and data['k'] < k1 \
+            and data['v'] > 2.5*data['average_v']:
                 k2 = data['k']
                 buyin_price = market_client.get_market_trade(symbol="btcusdt")[0].price
                 logger.info(f"上升发现买点")
