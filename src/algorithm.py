@@ -5,8 +5,14 @@ from .indicators import get_indicators
 from .swap import close_positions, get_all_positions, open, fund, LEVERAGE_RATE
 logger = get_logger('algorithm')
 
-def long_strategy():
+def test_run():
+    data = get_indicators()
     close_positions(get_all_positions())
+    current_fund = fund()
+    open(current_fund*0.2/(data['k']/1000)*LEVERAGE_RATE, 'buy')
+    close_positions(get_all_positions())
+    
+def long_strategy():
     m1 = None
     d1 = None
     k1 = None
