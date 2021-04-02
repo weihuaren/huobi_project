@@ -1,0 +1,7 @@
+    {
+        "host": "api.hbdm.com",
+        "contract_code": "BTC-USDT",
+        "api_key": "",
+        "secret_key": "",
+        "leverage_rate": 1
+    }

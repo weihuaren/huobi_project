@@ -1,17 +1,10 @@
 import logging
 import json
-from huobi.constant import *
-from huobi.client.market import MarketClient
-from huobi.utils import *
-from .client import MyAccountClient
 import pandas as pd
-from .futures import get_klines
-from src.util import get_logger
+from .swap import get_klines
+from .util import get_logger
 
 logger = get_logger('indicators')
-
-client = MyAccountClient()
-market_client = MarketClient()
 
 def get_indicators():
     try: 

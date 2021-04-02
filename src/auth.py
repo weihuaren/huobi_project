@@ -5,6 +5,9 @@ from datetime import datetime
 import hmac
 import base64
 from hashlib import sha256
+from .util import get_logger
+
+logger = get_logger('auth')
 
 def _get_url_suffix(method:str, access_key:str, secret_key:str, host:str, path:str)->str:
     timestamp = datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%S')
@@ -26,5 +29,4 @@ def post(access_key:str, secret_key:str, host:str, path:str, data:dict = None)->
         data = res.json()
         return data
     except Exception as e:
-        print(e)
-    return None
+        logger.error(e)
