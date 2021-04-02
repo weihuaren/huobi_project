@@ -21,7 +21,7 @@ def get_indicators():
         df['ma20_volume'] = df['volume'].rolling(window=20).mean()
         df['ma20_close'] = df['close'].rolling(window=20).mean()
         return {
-            'volume': df['volume'].iloc[-1],
+            'v': df['volume'].iloc[-1],
             'ma20_volume': df['ma20_volume'].iloc[-1],
             'k': df['close'].iloc[-1],
             'ma20_close': df['ma20_close'].iloc[-1],

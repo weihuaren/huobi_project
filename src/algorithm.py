@@ -13,6 +13,7 @@ def test_run():
     close_positions(get_all_positions())
     
 def long_strategy():
+    close_positions(get_all_positions())
     m1 = None
     d1 = None
     k1 = None
@@ -22,6 +23,7 @@ def long_strategy():
         time.sleep(1)
         try :
             data = get_indicators()
+            print(data)
             if data == 'error':
                 continue
             if (not k2) and (not m1) and (not d1) and (not k1) \
@@ -54,7 +56,7 @@ def long_strategy():
             and data['d'] > d1 \
             and data['d'] < data['m'] \
             and data['k'] < k1 \
-            and data['v'] > 2.5*data['average_v']:
+            and data['v'] > 2.5*data['ma20_volume']:
                 k2 = data['k']
                 logger.info(f"long strategy open buy positions")
                 current_fund = fund()
