@@ -24,7 +24,7 @@ def long_strategy():
         time.sleep(1)
         try :
             if k1:
-                logger.info(f'k1: {k1} d1: {d1} m1: {m1}' )
+                logger.info(f'k1: {k1} d1: {d1} m1: {m1} direction: {direction}')
             data = get_indicators()
             print(data)
             if data == 'error':
