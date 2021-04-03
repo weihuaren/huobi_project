@@ -19,13 +19,17 @@ def long_strategy():
     k1 = None
     k1_min = None
     k2 = None
+    direction = None
     while True:
         time.sleep(1)
         try :
+            if k1:
+                logger.info(f'k1: {k1} d1: {d1} m1: {m1}' )
             data = get_indicators()
             print(data)
             if data == 'error':
                 continue
+            #buy
             if (not k2) and (not m1) and (not d1) and (not k1) \
             and (data['m'] < 0) \
             and (data['d'] < 0):
@@ -33,24 +37,50 @@ def long_strategy():
                 d1 = data['d']
                 k1 = data['k']
                 k1_min = data['k']
+                direction = 'buy'
                 continue
 
+            #sell
+            if (not k2) and (not m1) and (not d1) and (not k1) \
+            and (data['m'] > 0) \
+            and (data['d'] > 0):
+                m1 = data['m']
+                d1 = data['d']
+                k1 = data['k']
+                k1_min = data['k']
+                direction = 'sell'
+                continue
+
+            #buy 
             if (not k2) and m1 and d1 and k1 \
+            and direction == 'buy' \
             and data['d'] > 0:
-                m1 = None
-                d1 = None
-                k1 = None
-                k1_min = None
-                continue
+                break
 
-            if m1 and d1 and k1:
+            #sell 
+            if (not k2) and m1 and d1 and k1 \
+            and direction == 'sell' \
+            and data['d'] < 0:
+                break
+
+            #buy
+            if  direction == 'buy' and m1 and d1 and k1:
                 m1 = min(m1, data['m'])
                 k1_min = min(k1_min, data['k'])
                 if data['d'] < d1:
                     d1 =  data['d']
                     k1 = k1_min
 
-            if (not k2) and m1 and d1 and k1 \
+            #sell
+            if  direction == 'sell' and m1 and d1 and k1:
+                m1 = max(m1, data['m'])
+                k1_min = max(k1_min, data['k'])
+                if data['d'] > d1:
+                    d1 =  data['d']
+                    k1 = k1_min
+
+            #buy
+            if direction == 'buy' and (not k2) and m1 and d1 and k1 \
             and (d1 < m1) \
             and data['m'] > m1 \
             and data['d'] > d1 \
@@ -58,18 +88,43 @@ def long_strategy():
             and data['k'] < k1 \
             and data['v'] > 2.5*data['ma20_volume']:
                 k2 = data['k']
-                logger.info(f"long strategy open buy positions")
+                logger.info(f'long strategy open {direction} positions')
                 current_fund = fund()
-                open(current_fund*0.2/(k2/1000)*LEVERAGE_RATE, 'buy')
+                open(current_fund*0.2/(k2/1000)*LEVERAGE_RATE, direction)
                 logger.info(f"k1={k1} k2={data['k']}")
                 logger.info(f"m1={m1} m2={data['m']}")
                 logger.info(f"d1={d1} d2={data['d']}")
                 continue
 
+            #sell
+            if direction == 'sell' and (not k2) and m1 and d1 and k1 \
+            and (d1 > m1) \
+            and data['m'] < m1 \
+            and data['d'] < d1 \
+            and data['d'] > data['m'] \
+            and data['k'] > k1 \
+            and data['v'] > 2.5*data['ma20_volume']:
+                k2 = data['k']
+                logger.info(f'long strategy open {direction} positions')
+                current_fund = fund()
+                open(current_fund*0.2/(k2/1000)*LEVERAGE_RATE, direction)
+                logger.info(f"k1={k1} k2={data['k']}")
+                logger.info(f"m1={m1} m2={data['m']}")
+                logger.info(f"d1={d1} d2={data['d']}")
+                continue
+            
+            #buy
             if k2 and data['k'] < k2*0.994:
                 logger.info(f"long strategy force close positions to prevent further loss")
                 close_positions(get_all_positions())
                 break
+            #sell
+            if k2 and data['k'] > k2*1.006:
+                logger.info(f"long strategy force close positions to prevent further loss")
+                close_positions(get_all_positions())
+                break
+            
+            #buy
             if k2 \
             and (data['d'] > 0 \
             or data['d'] < d1 \
@@ -81,6 +136,20 @@ def long_strategy():
                 logger.info(f"m1={m1} m2={data['m']}")
                 logger.info(f"d1={d1} d2={data['d']}")
                 break
+
+            #sell
+            if k2 \
+            and (data['d'] < 0 \
+            or data['d'] > d1 \
+            or data['k'] > 0.9*k2):
+                k2 = data['k']
+                logger.info(f"long strategy close positions")
+                close_positions(get_all_positions())
+                logger.info(f"k1={k1} k2= {k2} k3={data['k']}")
+                logger.info(f"m1={m1} m2={data['m']}")
+                logger.info(f"d1={d1} d2={data['d']}")
+                break
+            
         except Exception as e:
             logger.error(e)
             break
