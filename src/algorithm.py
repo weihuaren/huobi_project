@@ -114,18 +114,18 @@ def long_strategy():
                 continue
             
             #buy
-            if k2 and data['k'] < k2*0.994:
+            if direction == 'buy' and k2 and data['k'] < k2*0.994:
                 logger.info(f"long strategy force close positions to prevent further loss")
                 close_positions(get_all_positions())
                 break
             #sell
-            if k2 and data['k'] > k2*1.006:
+            if direction == 'sell' and k2 and data['k'] > k2*1.006:
                 logger.info(f"long strategy force close positions to prevent further loss")
                 close_positions(get_all_positions())
                 break
             
             #buy
-            if k2 \
+            if direction == 'buy' and k2 \
             and (data['d'] > 0 \
             or data['d'] < d1 \
             or data['k'] < 0.9*k2):
@@ -138,7 +138,7 @@ def long_strategy():
                 break
 
             #sell
-            if k2 \
+            if direction == 'sell' and k2 \
             and (data['d'] < 0 \
             or data['d'] > d1 \
             or data['k'] > 0.9*k2):
@@ -149,7 +149,7 @@ def long_strategy():
                 logger.info(f"m1={m1} m2={data['m']}")
                 logger.info(f"d1={d1} d2={data['d']}")
                 break
-            
+
         except Exception as e:
             logger.error(e)
             break
