@@ -86,7 +86,7 @@ def long_strategy():
             and data['d'] > d1 \
             and data['d'] < data['m'] \
             and data['k'] < k1 \
-            and data['v'] > 2.5*data['ma20_volume']:
+            and data['v'] > 3*data['ma20_volume']:
                 k2 = data['k']
                 logger.info(f'long strategy open {direction} positions')
                 current_fund = fund()
@@ -103,7 +103,7 @@ def long_strategy():
             and data['d'] < d1 \
             and data['d'] > data['m'] \
             and data['k'] > k1 \
-            and data['v'] > 2.5*data['ma20_volume']:
+            and data['v'] > 3*data['ma20_volume']:
                 k2 = data['k']
                 logger.info(f'long strategy open {direction} positions')
                 current_fund = fund()
@@ -114,21 +114,10 @@ def long_strategy():
                 continue
             
             #buy
-            if direction == 'buy' and k2 and data['k'] < k2*0.994:
-                logger.info(f"long strategy force close positions to prevent further loss")
-                close_positions(get_all_positions())
-                break
-            #sell
-            if direction == 'sell' and k2 and data['k'] > k2*1.006:
-                logger.info(f"long strategy force close positions to prevent further loss")
-                close_positions(get_all_positions())
-                break
-            
-            #buy
             if direction == 'buy' and k2 \
             and (data['d'] > 0 \
             or data['d'] < d1 \
-            or data['k'] < 0.9*k2):
+            or data['k'] < 0.994*k2):
                 k2 = data['k']
                 logger.info(f"long strategy close positions")
                 close_positions(get_all_positions())
@@ -141,7 +130,7 @@ def long_strategy():
             if direction == 'sell' and k2 \
             and (data['d'] < 0 \
             or data['d'] > d1 \
-            or data['k'] > 0.9*k2):
+            or data['k'] > 1.006*k2):
                 k2 = data['k']
                 logger.info(f"long strategy close positions")
                 close_positions(get_all_positions())
