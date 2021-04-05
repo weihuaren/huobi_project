@@ -23,8 +23,8 @@ def run_strategy():
     while True:
         time.sleep(1)
         try :
-            # if k1:
-            #     logger.info(f'k1: {k1} d1: {d1} m1: {m1} direction: {direction}')
+            if k1:
+                logger.info(f'k1: {k1} k2: {k2} d1: {d1} m1: {m1} direction: {direction}')
             data = get_indicators()
             if data == 'error':
                 continue

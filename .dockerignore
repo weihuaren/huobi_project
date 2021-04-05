@@ -1,0 +1,9 @@
+venv/
+config.json.example
+.git/
+main.log
+.theia
+README.md
+.gitignore
+Dockerfile
+dockerignore  

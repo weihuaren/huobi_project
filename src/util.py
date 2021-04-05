@@ -1,9 +1,8 @@
 import logging
 import json
-
+import sys
 def get_logger(name):
-    logging.basicConfig(handlers=[logging.FileHandler(filename="main.log", 
-                                                 encoding='utf-8', mode='a+')],
+    logging.basicConfig(stream=sys.stdout,
                     format="%(asctime)s %(name)s:%(levelname)s:%(message)s", 
                     datefmt="%F %A %T", 
                     level=logging.INFO)
