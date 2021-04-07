@@ -74,14 +74,6 @@ def get_all_positions():
         logger.error("cannot get account position")
         raise Exception("cannot get account position")
 
-def get_long_positions_only():
-    all_positions = get_all_positions()
-    return list(filter(lambda x: x['direction'] == 'buy', all_positions))
-
-def get_short_positions_only():
-    all_positions = get_all_positions()
-    return list(filter(lambda x: x['direction'] == 'sell', all_positions))
-
 def close_positions(positions):
     for position in positions:
         if position['direction'] == 'buy':
