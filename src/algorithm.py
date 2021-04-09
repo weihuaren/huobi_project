@@ -84,7 +84,7 @@ def run_strategy():
             and data['d'] > d1 \
             and data['d'] < data['m'] \
             and data['k'] < k1 \
-            and data['v'] > 3*data['ma20_volume']:
+            and data['v'] > 4*data['ma20_volume']:
                 k2 = data['k']
                 current_fund = fund()
                 open(current_fund*0.2/(k2/1000)*LEVERAGE_RATE, direction)
@@ -98,7 +98,7 @@ def run_strategy():
             and data['d'] < d1 \
             and data['d'] > data['m'] \
             and data['k'] > k1 \
-            and data['v'] > 3*data['ma20_volume']:
+            and data['v'] > 4*data['ma20_volume']:
                 k2 = data['k']
                 current_fund = fund()
                 open(current_fund*0.2/(k2/1000)*LEVERAGE_RATE, direction)
