@@ -14,9 +14,7 @@ Build and Push Container Image
 
 For example:
 ```
-docker build --tag huobi-swap-valid-until-01-06-2021 .
+docker build --tag gcr.io/huobi-project/huobi-swap-valid-until-01-06-2021:v1.0.x .
 
-docker tag huobi-swap-valid-until-01-06-2021:latest gcr.io/huobi-project/huobi-swap-valid-until-01-06-2021:v1.0.0
-
-docker push gcr.io/huobi-project/huobi-swap-valid-until-01-06-2021:v1.0.0
+docker push gcr.io/huobi-project/huobi-swap-valid-until-01-06-2021:v1.0.x
 ```

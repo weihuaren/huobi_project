@@ -107,9 +107,7 @@ def run_strategy():
             
             #buy
             if direction == 'buy' and k2 \
-            and (data['d'] > 0 \
-            or data['d'] < d1 \
-            or data['k'] < 0.996*k2):
+            and (data['d'] > 10 or data['k'] < 0.995*k2):
                 k2 = data['k']
                 close_positions(get_all_positions())
                 logger.info(f"close positions k1={k1} k2= {k2} k3={data['k']} m1={m1} m2={data['m']} d1={d1} d2={data['d']}")
@@ -117,9 +115,7 @@ def run_strategy():
 
             #sell
             if direction == 'sell' and k2 \
-            and (data['d'] < 0 \
-            or data['d'] > d1 \
-            or data['k'] > 1.004*k2):
+            and (data['d'] < 10 or data['k'] > 1.005*k2):
                 k2 = data['k']
                 close_positions(get_all_positions())
                 logger.info(f"close positions k1={k1} k2= {k2} k3={data['k']} m1={m1} m2={data['m']} d1={d1} d2={data['d']}")
