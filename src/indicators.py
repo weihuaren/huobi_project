@@ -19,16 +19,18 @@ def get_indicators():
         df['dea']= pd.Series.ewm(df['dif'], span=9).mean()
         df['histogram']= df['dif'] - df['dea']
         df['ma20_volume'] = df['volume'].rolling(window=20).mean()
-        df['ma20_close'] = df['close'].rolling(window=20).mean()
+        df['ma10_close'] = df['close'].rolling(window=10).mean()
         return {
             'v': df['volume'].iloc[-1],
             'ma20_volume': df['ma20_volume'].iloc[-1],
             'k': df['close'].iloc[-1],
-            'ma20_close': df['ma20_close'].iloc[-1],
+            'ma10_close': df['ma10_close'].iloc[-1],
             'd': df['dif'].iloc[-1],
             'm': df['histogram'].iloc[-1],
             'dea': df['dea'].iloc[-1],
             'previous_histogram': df['histogram'].iloc[-2],
+            'max_k_last_50': df['close'].tail(50).max(),
+            'min_k_last_50': df['close'].tail(50).min(),
         }
     except Exception as e:
         logger.error(e)

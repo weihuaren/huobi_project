@@ -20,13 +20,54 @@ def run_strategy():
     k1_min = None
     k2 = None
     direction = None
+
+    # market trend
+    max_k_last_50 = None
+    min_k_last_50 = None
+    trend_k = None
+    trend_strategy = False
+    trend_direction = None
+
     while True:
         time.sleep(1)
         try :
-            logger.info(f'k1: {k1} k2: {k2} d1: {d1} m1: {m1} direction: {direction}')
+            logger.info(f'k1:{k1} k2:{k2} d1:{d1} m1:{m1} trend_k:{trend_k} max_k_last_50:{max_k_last_50} max_k_last_50:{min_k_last_50} direction:{direction}')
             data = get_indicators()
             if data == 'error':
                 continue
+            print(data)
+
+            # market trend
+            max_k_last_50 = data['max_k_last_50']
+            min_k_last_50 = data['min_k_last_50']
+            if max_k_last_50 - min_k_last_50 < 200:
+                trend_strategy = True
+                if k2:
+                    close_positions(get_all_positions())
+                    break
+                if not trend_k and data['k'] > max_k_last_50:
+                    trend_k = data['k']
+                    trend_direction = 'buy'
+                    current_fund = fund()
+                    open(current_fund*0.2/(k2/1000)*LEVERAGE_RATE, trend_direction)
+                    logger.info(f"open buy positions trend_k={trend_k}")
+                    continue
+                if not trend_k and data['k'] < min_k_last_50:
+                    trend_k = data['k']
+                    trend_direction = 'sell'
+                    current_fund = fund()
+                    open(current_fund*0.2/(k2/1000)*LEVERAGE_RATE, trend_direction)
+                    logger.info(f"open sell positions trend_k={trend_k}")
+                    continue
+            else:
+                trend_strategy = False
+
+            if trend_k:
+                if (trend_direction == 'buy' and (data['k'] <= data['ma10_close'] or data['k'] < (trend_k - 220))) \
+                or (trend_direction == 'sell' and (data['k'] >= data['ma10_close'] or data['k'] > (trend_k + 220))):
+                    close_positions(get_all_positions())
+                    break
+
             #buy
             if (not k2) and (not m1) and (not d1) and (not k1) \
             and (data['m'] < 0) \
@@ -78,7 +119,7 @@ def run_strategy():
                     k1 = k1_min
 
             #buy
-            if direction == 'buy' and (not k2) and m1 and d1 and k1 \
+            if not trend_strategy and not trend_k and direction == 'buy' and (not k2) and m1 and d1 and k1 \
             and (d1 < m1) \
             and data['m'] > m1 \
             and data['d'] > d1 \
@@ -92,7 +133,7 @@ def run_strategy():
                 continue
 
             #sell
-            if direction == 'sell' and (not k2) and m1 and d1 and k1 \
+            if not trend_strategy and not trend_k and direction == 'sell' and (not k2) and m1 and d1 and k1 \
             and (d1 > m1) \
             and data['m'] < m1 \
             and data['d'] < d1 \
