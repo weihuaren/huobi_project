@@ -35,7 +35,6 @@ def run_strategy():
             data = get_indicators()
             if data == 'error':
                 continue
-            print(data)
 
             # market trend
             max_k_last_50 = data['max_k_last_50']
