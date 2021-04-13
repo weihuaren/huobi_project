@@ -31,10 +31,12 @@ def run_strategy():
     while True:
         time.sleep(1)
         try :
-            logger.info(f'k1:{k1} k2:{k2} d1:{d1} m1:{m1} trend_k:{trend_k} high_k_last_40:{high_k_last_40} low_k_last_40:{low_k_last_40} direction:{direction}')
+            
             data = get_indicators()
             if data == 'error':
                 continue
+
+            logger.info(f'k:{data["k"]} trend_strategy:{trend_strategy} trend_k:{trend_k} high_k_last_40:{high_k_last_40} low_k_last_40:{low_k_last_40} trend_direction:{trend_direction} ')
 
             # market trend
             high_k_last_40 = data['high_k_last_40']
