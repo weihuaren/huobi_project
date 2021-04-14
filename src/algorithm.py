@@ -46,14 +46,14 @@ def run_strategy():
                 if k2:
                     close_positions(get_all_positions())
                     break
-                if not trend_k and data['k'] > high_k_last_40:
+                if not trend_k and data['k'] >= high_k_last_40 + 10:
                     trend_k = data['k']
                     trend_direction = 'buy'
                     current_fund = fund()
                     open(current_fund*0.2/(k2/1000)*LEVERAGE_RATE, trend_direction)
                     logger.info(f"open buy positions trend_k={trend_k}")
                     continue
-                if not trend_k and data['k'] < low_k_last_40:
+                if not trend_k and data['k'] <= low_k_last_40 - 10:
                     trend_k = data['k']
                     trend_direction = 'sell'
                     current_fund = fund()
@@ -166,27 +166,3 @@ def run_strategy():
         except Exception as e:
             logger.error(e)
             break
-
-
-        
-        
-
-                               
-
-
-
-
-
-
-
-
-                        
-
-
-
-
-
-    
-    
-                
-
