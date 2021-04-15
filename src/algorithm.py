@@ -36,24 +36,25 @@ def run_strategy():
             if data == 'error':
                 continue
 
+            high_k_last_40 = data['high_k_last_40']
+            low_k_last_40 = data['low_k_last_40']
+
             logger.info(f'k:{data["k"]} trend_strategy:{trend_strategy} trend_k:{trend_k} high_k_last_40:{high_k_last_40} low_k_last_40:{low_k_last_40} trend_direction:{trend_direction} ')
 
             # market trend
-            high_k_last_40 = data['high_k_last_40']
-            low_k_last_40 = data['low_k_last_40']
             if high_k_last_40 - low_k_last_40 < 200:
                 trend_strategy = True
                 if k2:
                     close_positions(get_all_positions())
                     break
-                if not trend_k and data['k'] >= high_k_last_40 + 10:
+                if not trend_k and data['k'] > high_k_last_40:
                     trend_k = data['k']
                     trend_direction = 'buy'
                     current_fund = fund()
                     open(current_fund*0.2/(k2/1000)*LEVERAGE_RATE, trend_direction)
                     logger.info(f"open buy positions trend_k={trend_k}")
                     continue
-                if not trend_k and data['k'] <= low_k_last_40 - 10:
+                if not trend_k and data['k'] < low_k_last_40:
                     trend_k = data['k']
                     trend_direction = 'sell'
                     current_fund = fund()
