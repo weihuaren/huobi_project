@@ -44,9 +44,12 @@ def run_strategy():
             logger.info(f'k:{data["k"]} trend_strategy:{trend_strategy} trend_k:{trend_k} high_k_last_40:{high_k_last_40} low_k_last_40:{low_k_last_40} trend_direction:{trend_direction} ')
 
             # market trend
-            if data["k"] > low_k_last_40 + 210:
+            if high_k_last_40 - low_k_last_40 <= 200:
                 trend_strategy = True
-                if not trend_k: 
+                if k2:
+                    close_positions(get_all_positions())
+                    break
+                if not trend_k and data["k"] > low_k_last_40 + 210:
                     high_k_last_40_open = high_k_last_40
                     low_k_last_40_open = low_k_last_40
                     trend_k = data['k']
@@ -55,9 +58,7 @@ def run_strategy():
                     open(current_fund*0.2/(trend_k/1000)*LEVERAGE_RATE, trend_direction)
                     logger.info(f"open buy positions trend_k={trend_k}")
                     continue
-            elif data["k"] < high_k_last_40 - 210:
-                trend_strategy = True
-                if not trend_k: 
+                if not trend_k and data["k"] < high_k_last_40 - 210:
                     high_k_last_40_open = high_k_last_40
                     low_k_last_40_open = low_k_last_40
                     trend_k = data['k']
