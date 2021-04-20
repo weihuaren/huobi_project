@@ -11,7 +11,7 @@ def get_indicators():
         data = []
         klines = get_klines()
         for kline in klines:
-            data.append({'close': kline['close'], 'volume': kline['vol'], 'high': kline['high'], 'low': kline['low']})
+            data.append({'close': kline['close'], 'volume': kline['vol'], 'high': kline['high'], 'low': kline['low'], 'open': kline['open']})
         df = pd.DataFrame.from_dict(data)
         df['ema12'] = pd.Series.ewm(df['close'], span=12).mean()
         df['ema26'] = pd.Series.ewm(df['close'], span=26).mean()
@@ -24,6 +24,9 @@ def get_indicators():
             'v': df['volume'].iloc[-1],
             'ma20_volume': df['ma20_volume'].iloc[-1],
             'k': df['close'].iloc[-1],
+            'open': df['open'].iloc[-1],
+            'high': df['high'].iloc[-1],
+            'low': df['low'].iloc[-1],
             'ma15_close': df['ma15_close'].iloc[-1],
             'd': df['dif'].iloc[-1],
             'm': df['histogram'].iloc[-1],

@@ -41,7 +41,7 @@ def run_strategy():
             high_k_last_40 = data['high_k_last_40']
             low_k_last_40 = data['low_k_last_40']
 
-            logger.info(f'k:{data["k"]} trend_strategy:{trend_strategy} trend_k:{trend_k} high_k_last_40:{high_k_last_40} low_k_last_40:{low_k_last_40} trend_direction:{trend_direction} ')
+            logger.info(f'k:{data["k"]} k:{data["open"]} low:{data["low"]} high:{data["high"]} trend_strategy:{trend_strategy} trend_k:{trend_k} high_k_last_40:{high_k_last_40} low_k_last_40:{low_k_last_40} trend_direction:{trend_direction} ')
 
             # market trend
             if high_k_last_40 - low_k_last_40 <= 200:
@@ -133,7 +133,9 @@ def run_strategy():
             and data['d'] > d1 \
             and data['d'] < data['m'] \
             and data['k'] < k1 \
-            and data['v'] > 4*data['ma20_volume']:
+            and data['open'] > (data['high'] + data['low'])/2 \
+            and data['close'] > (data['high'] + data['low'])/2 \
+            and data['v'] > 3*data['ma20_volume']:
                 k2 = data['k']
                 current_fund = fund()
                 open(current_fund*0.2/(k2/1000)*LEVERAGE_RATE, direction)
@@ -147,7 +149,9 @@ def run_strategy():
             and data['d'] < d1 \
             and data['d'] > data['m'] \
             and data['k'] > k1 \
-            and data['v'] > 4*data['ma20_volume']:
+            and data['open'] < (data['high'] + data['low'])/2 \
+            and data['close'] < (data['high'] + data['low'])/2 \
+            and data['v'] > 3*data['ma20_volume']:
                 k2 = data['k']
                 current_fund = fund()
                 open(current_fund*0.2/(k2/1000)*LEVERAGE_RATE, direction)
@@ -156,7 +160,7 @@ def run_strategy():
             
             #buy
             if direction == 'buy' and k2 \
-            and (data['d'] > 10 or data['k'] < 0.995*k2):
+            and (data['d'] > 10 or data['k'] < 0.995*k2 or data['k'] < data['low']):
                 k2 = data['k']
                 close_positions(get_all_positions())
                 logger.info(f"close positions k1={k1} k2= {k2} k3={data['k']} m1={m1} m2={data['m']} d1={d1} d2={data['d']}")
@@ -164,7 +168,7 @@ def run_strategy():
 
             #sell
             if direction == 'sell' and k2 \
-            and (data['d'] < -10 or data['k'] > 1.005*k2):
+            and (data['d'] < -10 or data['k'] > 1.005*k2 or data['k'] > data['high']):
                 k2 = data['k']
                 close_positions(get_all_positions())
                 logger.info(f"close positions k1={k1} k2= {k2} k3={data['k']} m1={m1} m2={data['m']} d1={d1} d2={data['d']}")
