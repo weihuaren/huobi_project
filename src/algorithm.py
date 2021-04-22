@@ -132,7 +132,7 @@ def run_strategy():
             and data['m'] > m1 \
             and data['d'] > d1 \
             and data['d'] < data['m'] \
-            and data['k'] < k1 \
+            and data['low'] < k1 \
             and data['open'] > (data['high'] + data['low'])/2 \
             and data['close'] > (data['high'] + data['low'])/2 \
             and data['v'] > 3*data['ma20_volume']:
@@ -148,7 +148,7 @@ def run_strategy():
             and data['m'] < m1 \
             and data['d'] < d1 \
             and data['d'] > data['m'] \
-            and data['k'] > k1 \
+            and data['high'] > k1 \
             and data['open'] < (data['high'] + data['low'])/2 \
             and data['close'] < (data['high'] + data['low'])/2 \
             and data['v'] > 3*data['ma20_volume']:
