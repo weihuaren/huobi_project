@@ -134,7 +134,7 @@ def run_strategy():
             and data['d'] < data['m'] \
             and data['low'] < k1 \
             and data['open'] > (data['high'] + data['low'])/2 \
-            and data['close'] > (data['high'] + data['low'])/2 \
+            and data['k'] > (data['high'] + data['low'])/2 \
             and data['v'] > 3*data['ma20_volume']:
                 k2 = data['k']
                 current_fund = fund()
@@ -150,7 +150,7 @@ def run_strategy():
             and data['d'] > data['m'] \
             and data['high'] > k1 \
             and data['open'] < (data['high'] + data['low'])/2 \
-            and data['close'] < (data['high'] + data['low'])/2 \
+            and data['k'] < (data['high'] + data['low'])/2 \
             and data['v'] > 3*data['ma20_volume']:
                 k2 = data['k']
                 current_fund = fund()
