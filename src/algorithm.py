@@ -44,12 +44,12 @@ def run_strategy():
             logger.info(f'k:{data["k"]} k:{data["open"]} low:{data["low"]} high:{data["high"]} trend_strategy:{trend_strategy} trend_k:{trend_k} high_k_last_40:{high_k_last_40} low_k_last_40:{low_k_last_40} trend_direction:{trend_direction} ')
 
             # market trend
-            if high_k_last_40 - low_k_last_40 <= 200:
+            if high_k_last_40 - low_k_last_40 <= 400:
                 trend_strategy = True
                 if k2:
                     close_positions(get_all_positions())
                     break
-                if not trend_k and data["k"] > low_k_last_40 + 210:
+                if not trend_k and data["k"] > low_k_last_40 + 410:
                     high_k_last_40_open = high_k_last_40
                     low_k_last_40_open = low_k_last_40
                     trend_k = data['k']
@@ -58,7 +58,7 @@ def run_strategy():
                     open(current_fund*0.2/(trend_k/1000)*LEVERAGE_RATE, trend_direction)
                     logger.info(f"open buy positions trend_k={trend_k}")
                     continue
-                if not trend_k and data["k"] < high_k_last_40 - 210:
+                if not trend_k and data["k"] < high_k_last_40 - 410:
                     high_k_last_40_open = high_k_last_40
                     low_k_last_40_open = low_k_last_40
                     trend_k = data['k']
@@ -71,8 +71,8 @@ def run_strategy():
                 trend_strategy = False
 
             if trend_k:
-                if (trend_direction == 'buy' and ((data['k'] <= data['ma15_close'] and data['k'] > low_k_last_40_open + 210) or data['k'] < low_k_last_40_open)) \
-                or (trend_direction == 'sell' and ((data['k'] >= data['ma15_close'] and data['k'] < high_k_last_40_open - 210) or data['k'] > high_k_last_40_open)):
+                if (trend_direction == 'buy' and ((data['k'] <= data['ma15_close'] and data['k'] > low_k_last_40_open + 410) or data['k'] < low_k_last_40_open)) \
+                or (trend_direction == 'sell' and ((data['k'] >= data['ma15_close'] and data['k'] < high_k_last_40_open - 410) or data['k'] > high_k_last_40_open)):
                     close_positions(get_all_positions())
                     break
 

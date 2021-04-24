@@ -32,8 +32,8 @@ def get_indicators():
             'm': df['histogram'].iloc[-1],
             'dea': df['dea'].iloc[-1],
             'previous_histogram': df['histogram'].iloc[-2],
-            'high_k_last_40': df['high'][:-1].tail(40).max(),
-            'low_k_last_40': df['low'][:-1].tail(40).min(),
+            'high_k_last_40': df['high'][:-1].tail(30).max(),
+            'low_k_last_40': df['low'][:-1].tail(30).min(),
         }
     except Exception as e:
         logger.error(e)
