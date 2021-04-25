@@ -3,177 +3,95 @@ import time
 from .util import get_logger
 from .indicators import get_indicators
 from .swap import close_positions, get_all_positions, open, fund, LEVERAGE_RATE
-logger = get_logger('algorithm')
 
-def test_run():
-    data = get_indicators()
-    close_positions(get_all_positions())
-    current_fund = fund()
-    open(current_fund*0.2/(data['k']/1000)*LEVERAGE_RATE, 'buy')
-    close_positions(get_all_positions())
-    
-def run_strategy():
+macd_logger = get_logger('macd_strategy')
+trend_logger = get_logger('trend_strategy')
+
+def macd_strategy():
     close_positions(get_all_positions())
     m1 = None
     d1 = None
-    k1 = None
-    k1_min = None
-    k2 = None
+    l1 = None
+    h1 = None
+    allow_buy = False
+    buy_price = None
     direction = None
-
-    # market trend
-    high_k_last_40 = None
-    low_k_last_40 = None
-    high_k_last_40_open = None
-    low_k_last_40_open = None
-    trend_k = None
-    trend_strategy = False
-    trend_direction = None
-
     while True:
         time.sleep(1)
         try :
-            
             data = get_indicators()
             if data == 'error':
                 continue
 
-            high_k_last_40 = data['high_k_last_40']
-            low_k_last_40 = data['low_k_last_40']
+            # log data
+            macd_logger.info(data)
+            macd_logger.info(f'm1:{m1} d1:{d1} l1:{l1} h1:{h1} direction:{direction} allow_buy:{allow_buy} buy_price:{buy_price}')
 
-            logger.info(f'k:{data["k"]} k:{data["open"]} low:{data["low"]} high:{data["high"]} trend_strategy:{trend_strategy} trend_k:{trend_k} high_k_last_40:{high_k_last_40} low_k_last_40:{low_k_last_40} trend_direction:{trend_direction} ')
-
-            # market trend
-            if high_k_last_40 - low_k_last_40 <= 400:
-                trend_strategy = True
-                if k2:
+            # don't open position in macd strategy when trend strategy condition is met
+            if data['h_last_30'] - data['l_last_30'] <= 400:
+                allow_buy = False
+                if buy_price:
                     close_positions(get_all_positions())
                     break
-                if not trend_k and data["k"] > low_k_last_40 + 410:
-                    high_k_last_40_open = high_k_last_40
-                    low_k_last_40_open = low_k_last_40
-                    trend_k = data['k']
-                    trend_direction = 'buy'
-                    current_fund = fund()
-                    open(current_fund*0.2/(trend_k/1000)*LEVERAGE_RATE, trend_direction)
-                    logger.info(f"open buy positions trend_k={trend_k}")
-                    continue
-                if not trend_k and data["k"] < high_k_last_40 - 410:
-                    high_k_last_40_open = high_k_last_40
-                    low_k_last_40_open = low_k_last_40
-                    trend_k = data['k']
-                    trend_direction = 'sell'
-                    current_fund = fund()
-                    open(current_fund*0.2/(trend_k/1000)*LEVERAGE_RATE, trend_direction)
-                    logger.info(f"open buy positions trend_k={trend_k}")
-                    continue
             else:
-                trend_strategy = False
+                allow_buy = True
+            # open buy
+            if (data['m'] < 0 ) and (data['d'] < 0):
+                m1 = min(data['m'], m1) if m1 else data['m']
+                d1 = min(data['d'], d1) if d1 else data['d']
+                l1 = min(data['l'], l1) if l1 else data['l']
+                h1 = None
+            
+            # open sell
+            if (data['m'] > 0 ) and (data['d'] > 0):
+                print('hello')
+                m1 = max(data['m'], m1) if m1 else data['m']
+                d1 = max(data['d'], d1) if d1 else data['d']
+                h1 = max(data['h'], h1) if h1 else data['h']
+                l1 = None
 
-            if trend_k:
-                if (trend_direction == 'buy' and ((data['k'] <= data['ma15_close'] and data['k'] > low_k_last_40_open + 410) or data['k'] < low_k_last_40_open)) \
-                or (trend_direction == 'sell' and ((data['k'] >= data['ma15_close'] and data['k'] < high_k_last_40_open - 410) or data['k'] > high_k_last_40_open)):
-                    close_positions(get_all_positions())
-                    break
-
-            #buy
-            if (not k2) and (not m1) and (not d1) and (not k1) \
-            and (data['m'] < 0) \
-            and (data['d'] < 0):
-                m1 = data['m']
-                d1 = data['d']
-                k1 = data['k']
-                k1_min = data['k']
-                direction = 'buy'
-                continue
-
-            #sell
-            if (not k2) and (not m1) and (not d1) and (not k1) \
-            and (data['m'] > 0) \
-            and (data['d'] > 0):
-                m1 = data['m']
-                d1 = data['d']
-                k1 = data['k']
-                k1_min = data['k']
-                direction = 'sell'
-                continue
-
-            #buy 
-            if (not k2) and m1 and d1 and k1 \
-            and direction == 'buy' \
-            and data['d'] > 0:
-                break
-
-            #sell 
-            if (not k2) and m1 and d1 and k1 \
-            and direction == 'sell' \
-            and data['d'] < 0:
-                break
-
-            #buy
-            if  direction == 'buy' and m1 and d1 and k1:
-                m1 = min(m1, data['m'])
-                k1_min = min(k1_min, data['k'])
-                if data['d'] < d1:
-                    d1 =  data['d']
-                    k1 = k1_min
-
-            #sell
-            if  direction == 'sell' and m1 and d1 and k1:
-                m1 = max(m1, data['m'])
-                k1_min = max(k1_min, data['k'])
-                if data['d'] > d1:
-                    d1 =  data['d']
-                    k1 = k1_min
-
-            #buy
-            if not trend_strategy and not trend_k and direction == 'buy' and (not k2) and m1 and d1 and k1 \
-            and (d1 < m1) \
+            # open buy
+            if allow_buy and not buy_price and l1 \
+            and d1 < m1 \
             and data['m'] > m1 \
             and data['d'] > d1 \
-            and data['d'] < data['m'] \
-            and data['low'] < k1 \
-            and data['open'] > (data['high'] + data['low'])/2 \
-            and data['k'] > (data['high'] + data['low'])/2 \
-            and data['v'] > 3*data['ma20_volume']:
-                k2 = data['k']
+            and data['l'] < l1 \
+            and data['v'] > 3*data['v_20ma'] \
+            and data['o'] > (data['h']+data['l'])/2 \
+            and data['k'] > (data['h']+data['l'])/2:
+                direction = 'buy'
+                buy_price = data['k']
                 current_fund = fund()
-                open(current_fund*0.2/(k2/1000)*LEVERAGE_RATE, direction)
-                logger.info(f"open {direction} positions k1={k1} k2={data['k']} m1={m1} m2={data['m']} d1={d1} d2={data['d']}")
+                open(current_fund*0.2/(buy_price/1000)*LEVERAGE_RATE, 'buy')
                 continue
 
-            #sell
-            if not trend_strategy and not trend_k and direction == 'sell' and (not k2) and m1 and d1 and k1 \
-            and (d1 > m1) \
+            # open sell
+            if allow_buy and not buy_price and h1 \
+            and d1 > m1 \
             and data['m'] < m1 \
             and data['d'] < d1 \
-            and data['d'] > data['m'] \
-            and data['high'] > k1 \
-            and data['open'] < (data['high'] + data['low'])/2 \
-            and data['k'] < (data['high'] + data['low'])/2 \
-            and data['v'] > 3*data['ma20_volume']:
-                k2 = data['k']
+            and data['h'] > h1 \
+            and data['v'] > 3*data['v_20ma'] \
+            and data['o'] < (data['h']+data['l'])/2 \
+            and data['k'] < (data['h']+data['l'])/2:
+                direction = 'sell'
+                buy_price = data['k']
                 current_fund = fund()
-                open(current_fund*0.2/(k2/1000)*LEVERAGE_RATE, direction)
-                logger.info(f"open {direction} positions k1={k1} k2={data['k']} m1={m1} m2={data['m']} d1={d1} d2={data['d']}")
+                open(current_fund*0.2/(buy_price/1000)*LEVERAGE_RATE, 'sell')
                 continue
+
+            # close buy
+            if buy_price and direction == 'buy'\
+            and (data['d'] > 10 or data['k'] <= buy_price*0.995 or data['k'] < l1):
+                 close_positions(get_all_positions())
+                 break
+
+            # close sell
+            if buy_price and direction == 'sell'\
+            and (data['d'] < -10 or data['k'] >= buy_price*1.005 or data['k'] > h1):
+                 close_positions(get_all_positions())
+                 break
             
-            #buy
-            if direction == 'buy' and k2 \
-            and (data['d'] > 10 or data['k'] < 0.995*k2 or data['k'] < data['low']):
-                k2 = data['k']
-                close_positions(get_all_positions())
-                logger.info(f"close positions k1={k1} k2= {k2} k3={data['k']} m1={m1} m2={data['m']} d1={d1} d2={data['d']}")
-                break
-
-            #sell
-            if direction == 'sell' and k2 \
-            and (data['d'] < -10 or data['k'] > 1.005*k2 or data['k'] > data['high']):
-                k2 = data['k']
-                close_positions(get_all_positions())
-                logger.info(f"close positions k1={k1} k2= {k2} k3={data['k']} m1={m1} m2={data['m']} d1={d1} d2={data['d']}")
-                break
-
         except Exception as e:
-            logger.error(e)
+            macd_logger.error(e)
             break

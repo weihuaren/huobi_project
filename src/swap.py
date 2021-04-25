@@ -1,11 +1,13 @@
 import requests
 import json
+import os
 from .auth import post
 from .util import get_configs, get_logger
 
 logger = get_logger('futures')
 
-configs = get_configs()
+config_name = f"{os.environ['strategy']}.json"
+configs = get_configs(config_name)
 CONTRACT_CODE = configs["contract_code"]
 HOST = configs["host"]
 ACCESS_KEY = configs["api_key"]

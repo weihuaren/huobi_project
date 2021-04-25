@@ -18,22 +18,22 @@ def get_indicators():
         df['dif']= df['ema12'] - df['ema26']
         df['dea']= pd.Series.ewm(df['dif'], span=9).mean()
         df['histogram']= df['dif'] - df['dea']
-        df['ma20_volume'] = df['volume'].rolling(window=20).mean()
+        df['v_20ma'] = df['volume'].rolling(window=20).mean()
         df['ma15_close'] = df['close'].rolling(window=15).mean()
         return {
             'v': df['volume'].iloc[-1],
-            'ma20_volume': df['ma20_volume'].iloc[-1],
+            'v_20ma': df['v_20ma'].iloc[-1],
             'k': df['close'].iloc[-1],
-            'open': df['open'].iloc[-1],
-            'high': df['high'].iloc[-1],
-            'low': df['low'].iloc[-1],
-            'ma15_close': df['ma15_close'].iloc[-1],
+            'o': df['open'].iloc[-1],
+            'h': df['high'].iloc[-1],
+            'l': df['low'].iloc[-1],
+            'k_15ma': df['ma15_close'].iloc[-1],
             'd': df['dif'].iloc[-1],
             'm': df['histogram'].iloc[-1],
             'dea': df['dea'].iloc[-1],
             'previous_histogram': df['histogram'].iloc[-2],
-            'high_k_last_40': df['high'][:-1].tail(30).max(),
-            'low_k_last_40': df['low'][:-1].tail(30).min(),
+            'h_last_30': df['high'][:-1].tail(30).max(),
+            'l_last_30': df['low'][:-1].tail(30).min(),
         }
     except Exception as e:
         logger.error(e)

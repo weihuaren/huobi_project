@@ -1,6 +1,6 @@
 .theia/
 venv/
-config.json
+*.json
 *.log
 __pycache__/
 tradelog.txt

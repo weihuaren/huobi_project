@@ -8,6 +8,6 @@ def get_logger(name):
                     level=logging.INFO)
     return logging.getLogger(name)
 
-def get_configs():
-    with open('config.json') as json_file:
+def get_configs(filename):
+    with open(filename) as json_file:
         return json.load(json_file)
