@@ -7,7 +7,7 @@ from .swap import close_positions, get_all_positions, open, fund, LEVERAGE_RATE
 macd_logger = get_logger('macd_strategy')
 trend_logger = get_logger('trend_strategy')
 
-def macd_strategy():
+def macd_strategy():    
     close_positions(get_all_positions())
     m1 = None
     d1 = None
@@ -35,6 +35,7 @@ def macd_strategy():
                     break
             else:
                 allow_buy = True
+
             # open buy
             if (data['m'] < 0 ) and (data['d'] < 0):
                 m1 = min(data['m'], m1) if m1 else data['m']
@@ -44,7 +45,6 @@ def macd_strategy():
             
             # open sell
             if (data['m'] > 0 ) and (data['d'] > 0):
-                print('hello')
                 m1 = max(data['m'], m1) if m1 else data['m']
                 d1 = max(data['d'], d1) if d1 else data['d']
                 h1 = max(data['h'], h1) if h1 else data['h']
@@ -94,4 +94,46 @@ def macd_strategy():
             
         except Exception as e:
             macd_logger.error(e)
+            break
+
+def trend_strategy():
+    close_positions(get_all_positions())
+    buy_price = None
+    direction = None
+    while True:
+        time.sleep(1)
+        try :
+            data = get_indicators()
+            if data == 'error':
+                continue
+            # log data
+            trend_logger.info(f'buy_price:{buy_price} direction:{direction}')
+            trend_logger.info(data)
+            if not buy_price and data['h_last_30'] - data['l_last_30'] <= 400:
+                if data['k'] > data['h_last_30'] + 10:
+                    direction = 'buy'
+                    buy_price = data['k']
+                    current_fund = fund()
+                    open(current_fund*0.2/(buy_price/1000)*LEVERAGE_RATE, 'buy')
+                    continue
+                elif data['k'] < data['l_last_30'] - 10:
+                    direction = 'sell'
+                    buy_price = data['k']
+                    current_fund = fund()
+                    open(current_fund*0.2/(buy_price/1000)*LEVERAGE_RATE, 'buy')
+                    continue
+
+            if buy_price and direction == 'buy':
+                if (buy_price <= data['k_15ma'] and buy_price > data['h_last_30']) \
+                or buy_price < data['l_last_30']:
+                    close_positions(get_all_positions())
+                    break
+                
+            if buy_price and direction == 'sell':
+                if (buy_price >= data['k_15ma'] and buy_price < data['l_last_30']) \
+                or buy_price > data['h_last_30']:
+                    close_positions(get_all_positions())
+                    break
+        except Exception as e:
+            trend_logger.error(e)
             break
