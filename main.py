@@ -10,7 +10,7 @@ if __name__ == '__main__':
     close_positions(get_all_positions())
     strategy = os.environ['strategy']
     logger.info(f'{strategy} strategy started')
-    if strategy == 'local':
+    if strategy == 'macd':
         while True:
             try:
                 macd_strategy()

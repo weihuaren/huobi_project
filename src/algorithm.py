@@ -99,11 +99,15 @@ def macd_strategy():
 def trend_strategy():
     close_positions(get_all_positions())
     buy_price = None
+    buy_timestamp = None
     direction = None
     while True:
         time.sleep(1)
         try :
+            time_now = time.time()
             data = get_indicators()
+            h_last_30 = None
+            l_last_30 = None
             if data == 'error':
                 continue
             # log data
@@ -112,26 +116,34 @@ def trend_strategy():
             if not buy_price and data['h_last_30'] - data['l_last_30'] <= 400:
                 if data['k'] > data['h_last_30'] + 10:
                     direction = 'buy'
+                    buy_timestamp = time.time()
+                    h_last_30 = data['h_last_30']
+                    l_last_30 = data['l_last_30']
                     buy_price = data['k']
                     current_fund = fund()
                     open(current_fund*0.2/(buy_price/1000)*LEVERAGE_RATE, 'buy')
                     continue
                 elif data['k'] < data['l_last_30'] - 10:
                     direction = 'sell'
+                    buy_timestamp = time.time()
+                    h_last_30 = data['h_last_30']
+                    l_last_30 = data['l_last_30']
                     buy_price = data['k']
                     current_fund = fund()
                     open(current_fund*0.2/(buy_price/1000)*LEVERAGE_RATE, 'buy')
                     continue
 
             if buy_price and direction == 'buy':
-                if (buy_price <= data['k_15ma'] and buy_price > data['h_last_30']) \
-                or buy_price < data['l_last_30']:
+                if (data['k'] <= data['k_15ma'] and data['k'] > h_last_30) \
+                or data['k'] < l_last_30 \
+                or time_now - buy_timestamp > 60*20:
                     close_positions(get_all_positions())
                     break
                 
             if buy_price and direction == 'sell':
-                if (buy_price >= data['k_15ma'] and buy_price < data['l_last_30']) \
-                or buy_price > data['h_last_30']:
+                if (data['k'] >= data['k_15ma'] and data['k'] < l_last_30) \
+                or data['k'] > h_last_30 \
+                or time_now - buy_timestamp > 60*20:
                     close_positions(get_all_positions())
                     break
         except Exception as e:
