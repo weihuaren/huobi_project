@@ -101,13 +101,14 @@ def trend_strategy():
     buy_price = None
     buy_timestamp = None
     direction = None
+    h_last_30 = None
+    l_last_30 = None
     while True:
         time.sleep(1)
         try :
             time_now = time.time()
             data = get_indicators()
-            h_last_30 = None
-            l_last_30 = None
+
             if data == 'error':
                 continue
             # log data
