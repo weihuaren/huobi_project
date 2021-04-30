@@ -131,7 +131,7 @@ def trend_strategy():
                     l_last_30 = data['l_last_30']
                     buy_price = data['k']
                     current_fund = fund()
-                    open(current_fund*0.2/(buy_price/1000)*LEVERAGE_RATE, 'buy')
+                    open(current_fund*0.2/(buy_price/1000)*LEVERAGE_RATE, 'sell')
                     continue
 
             if buy_price and direction == 'buy':
