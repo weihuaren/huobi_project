@@ -136,17 +136,19 @@ def trend_strategy():
 
             if buy_price and direction == 'buy':
                 if (data['k'] <= data['k_15ma'] and data['k'] > h_last_30) \
-                or data['k'] < l_last_30 \
-                or time_now - buy_timestamp > 60*20:
+                or data['k'] < l_last_30:
                     close_positions(get_all_positions())
                     break
                 
             if buy_price and direction == 'sell':
                 if (data['k'] >= data['k_15ma'] and data['k'] < l_last_30) \
-                or data['k'] > h_last_30 \
-                or time_now - buy_timestamp > 60*20:
+                or data['k'] > h_last_30:
                     close_positions(get_all_positions())
                     break
+
+            if data['k'] < h_last_30 and data['k'] > l_last_30 and time_now - buy_timestamp > 60*20:
+                close_positions(get_all_positions())
+                break
         except Exception as e:
             trend_logger.error(e)
             break
