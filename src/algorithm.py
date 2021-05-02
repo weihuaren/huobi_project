@@ -193,13 +193,15 @@ def trend_strategy_two():
 
             if buy_price and direction == 'buy':
                 if (data['k'] <= data['k_15ma'] and data['k'] > h_last_30) \
-                or data['k'] < l_last_30:
+                or data['k'] < l_last_30 \
+                or data['o'] < (data['h'] + data['l'])/2 and data['k'] < (data['h'] + data['l'])/2 and data['h'] > data['h_ma']:
                     close_positions(get_all_positions())
                     break
                 
             if buy_price and direction == 'sell':
                 if (data['k'] >= data['k_15ma'] and data['k'] < l_last_30) \
-                or data['k'] > h_last_30:
+                or data['k'] > h_last_30 \
+                or data['o'] > (data['h'] + data['l'])/2 and data['k'] > (data['h'] + data['l'])/2 and data['l'] < data['l_ma']:
                     close_positions(get_all_positions())
                     break
 

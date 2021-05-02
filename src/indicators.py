@@ -20,6 +20,8 @@ def get_indicators():
         df['histogram']= df['dif'] - df['dea']
         df['v_20ma'] = df['volume'].rolling(window=20).mean()
         df['ma15_close'] = df['close'].rolling(window=9).mean()
+        df['ma_high'] = df['high'].rolling(window=5).mean()
+        df['ma_low'] = df['low'].rolling(window=5).mean()
         return {
             'v': df['volume'].iloc[-1],
             'v_20ma': df['v_20ma'].iloc[-1],
@@ -28,6 +30,8 @@ def get_indicators():
             'h': df['high'].iloc[-1],
             'l': df['low'].iloc[-1],
             'k_15ma': df['ma15_close'].iloc[-1],
+            'h_ma': df['ma_high'].iloc[-1],
+            'l_ma': df['ma_low'].iloc[-1],
             'd': df['dif'].iloc[-1],
             'm': df['histogram'].iloc[-1],
             'dea': df['dea'].iloc[-1],
