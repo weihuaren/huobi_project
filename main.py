@@ -1,7 +1,7 @@
 import logging
 import os
 from src.swap import close_positions, get_all_positions, open, fund, LEVERAGE_RATE
-from src.algorithm import macd_strategy, trend_strategy
+from src.algorithm import macd_strategy, trend_strategy, trend_strategy_two
 from src.util import get_logger
 
 logger = get_logger('main')
@@ -20,6 +20,18 @@ if __name__ == '__main__':
         while True:
             try:
                 trend_strategy()
+            except Exception as e:
+                logger.error(e)
+    elif strategy == 'trend-ethusdt':
+        while True:
+            try:
+                trend_strategy_two()
+            except Exception as e:
+                logger.error(e)
+    elif strategy == 'trend-mdxusdt':
+        while True:
+            try:
+                trend_strategy_two()
             except Exception as e:
                 logger.error(e)
     else:

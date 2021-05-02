@@ -19,7 +19,7 @@ def get_indicators():
         df['dea']= pd.Series.ewm(df['dif'], span=9).mean()
         df['histogram']= df['dif'] - df['dea']
         df['v_20ma'] = df['volume'].rolling(window=20).mean()
-        df['ma15_close'] = df['close'].rolling(window=15).mean()
+        df['ma15_close'] = df['close'].rolling(window=9).mean()
         return {
             'v': df['volume'].iloc[-1],
             'v_20ma': df['v_20ma'].iloc[-1],
