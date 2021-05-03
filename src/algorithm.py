@@ -2,7 +2,7 @@ import json
 import time
 from .util import get_logger
 from .indicators import get_indicators
-from .swap import close_positions, get_all_positions, open, fund, LEVERAGE_RATE
+from .swap import close_positions, get_all_positions, open, fund, LEVERAGE_RATE, CONTRACT_CODE
 
 macd_logger = get_logger('macd_strategy')
 trend_logger = get_logger('trend_strategy')
@@ -61,8 +61,7 @@ def macd_strategy():
             and data['k'] > (data['h']+data['l'])/2:
                 direction = 'buy'
                 buy_price = data['k']
-                current_fund = fund()
-                open(current_fund*0.2/(buy_price/1000)*LEVERAGE_RATE, 'buy')
+                open(buy_price, 'buy')
                 continue
 
             # open sell
@@ -76,8 +75,7 @@ def macd_strategy():
             and data['k'] < (data['h']+data['l'])/2:
                 direction = 'sell'
                 buy_price = data['k']
-                current_fund = fund()
-                open(current_fund*0.2/(buy_price/1000)*LEVERAGE_RATE, 'sell')
+                open(buy_price, 'sell')
                 continue
 
             # close buy
@@ -104,6 +102,8 @@ def trend_strategy():
     h_last_30 = None
     l_last_30 = None
     while True:
+        if buy_price:
+            time.sleep(59)
         time.sleep(1)
         try :
             time_now = time.time()
@@ -114,15 +114,14 @@ def trend_strategy():
             # log data
             trend_logger.info(f'buy_price:{buy_price} direction:{direction}')
             trend_logger.info(data)
-            if not buy_price and data['h_last_30'] - data['l_last_30'] <= 400:
+            if not buy_price and (data['h_last_30'] - data['l_last_30'] <= 400 or CONTRACT_CODE != 'BTC-USDT'):
                 if data['k'] > data['h_last_30']:
                     direction = 'buy'
                     buy_timestamp = time.time()
                     h_last_30 = data['h_last_30']
                     l_last_30 = data['l_last_30']
                     buy_price = data['k']
-                    current_fund = fund()
-                    open(current_fund*0.2/(buy_price/1000)*LEVERAGE_RATE, 'buy')
+                    open(buy_price, 'buy')
                     continue
                 elif data['k'] < data['l_last_30']:
                     direction = 'sell'
@@ -130,67 +129,7 @@ def trend_strategy():
                     h_last_30 = data['h_last_30']
                     l_last_30 = data['l_last_30']
                     buy_price = data['k']
-                    current_fund = fund()
-                    open(current_fund*0.2/(buy_price/1000)*LEVERAGE_RATE, 'sell')
-                    continue
-
-            if buy_price and direction == 'buy':
-                if (data['k'] <= data['k_15ma'] and data['k'] > h_last_30) \
-                or data['k'] < l_last_30 \
-                or data['o'] < (data['h'] + data['l'])/2 and data['k'] < (data['h'] + data['l'])/2 and data['h'] > data['h_ma']:
-                    close_positions(get_all_positions())
-                    break
-                
-            if buy_price and direction == 'sell':
-                if (data['k'] >= data['k_15ma'] and data['k'] < l_last_30) \
-                or data['k'] > h_last_30 \
-                or data['o'] > (data['h'] + data['l'])/2 and data['k'] > (data['h'] + data['l'])/2 and data['l'] < data['l_ma']:
-                    close_positions(get_all_positions())
-                    break
-
-            if buy_price and data['k'] < h_last_30 and data['k'] > l_last_30 and time_now - buy_timestamp > 60*20:
-                close_positions(get_all_positions())
-                break
-        except Exception as e:
-            trend_logger.error(e)
-            break
-
-def trend_strategy_two():
-    close_positions(get_all_positions())
-    buy_price = None
-    buy_timestamp = None
-    direction = None
-    h_last_30 = None
-    l_last_30 = None
-    while True:
-        time.sleep(1)
-        try :
-            time_now = time.time()
-            data = get_indicators()
-
-            if data == 'error':
-                continue
-            # log data
-            trend_logger.info(f'buy_price:{buy_price} direction:{direction}')
-            trend_logger.info(data)
-            if not buy_price:
-                if data['k'] > data['h_last_30']:
-                    direction = 'buy'
-                    buy_timestamp = time.time()
-                    h_last_30 = data['h_last_30']
-                    l_last_30 = data['l_last_30']
-                    buy_price = data['k']
-                    current_fund = fund()
-                    open(current_fund*0.2/(buy_price/1000)*LEVERAGE_RATE, 'buy')
-                    continue
-                elif data['k'] < data['l_last_30']:
-                    direction = 'sell'
-                    buy_timestamp = time.time()
-                    h_last_30 = data['h_last_30']
-                    l_last_30 = data['l_last_30']
-                    buy_price = data['k']
-                    current_fund = fund()
-                    open(current_fund*0.2/(buy_price/1000)*LEVERAGE_RATE, 'sell')
+                    open(buy_price, 'sell')
                     continue
 
             if buy_price and direction == 'buy':

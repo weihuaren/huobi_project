@@ -13,6 +13,12 @@ HOST = configs["host"]
 ACCESS_KEY = configs["api_key"]
 ACCESS_SECRET = configs["secret_key"]
 LEVERAGE_RATE = configs["leverage_rate"]
+USDT_RATES = {
+    "BTC-USDT": 1000,
+    "ETH-USDT": 100,
+    "MDX-USDT": 1
+}
+
 
 def get_klines(contract_code=CONTRACT_CODE, period='1min', size=200):
     try :
@@ -22,7 +28,9 @@ def get_klines(contract_code=CONTRACT_CODE, period='1min', size=200):
         logger.error(e)
 
 # example open(1, 'buy') open(2, 'sell')
-def open(volume, direction):
+def open(buy_price, direction):
+    current_fund = fund()
+    volume = current_fund*0.2/(buy_price/USDT_RATES[CONTRACT_CODE])*LEVERAGE_RATE
     data={
         "contract_code": CONTRACT_CODE,
         "direction": direction,
